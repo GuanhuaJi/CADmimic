@@ -1,0 +1,50 @@
+[2025-09-11 03:15:16] [load] Loading module '/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_09.py'
+[2025-09-11 03:15:16] [load] Collected 1 object(s)
+[2025-09-11 03:15:16] [fit] bbox=(200.000,36.000,4.000) R=101.627 dist=455.132
+[2025-09-11 03:15:16] [render] View=top pos=(0.4551312871753524, 0.0, 455.1312871753524) roll=0
+[2025-09-11 03:15:16] [render] View=bottom pos=(0.4551312871753524, 0.0, -455.1312871753524) roll=180
+[2025-09-11 03:15:16] [render] View=front pos=(0.4551312871753524, 455.1312871753524, 0.0) roll=0
+[2025-09-11 03:15:16] [render] View=back pos=(0.4551312871753524, -455.1312871753524, 0.0) roll=180
+[2025-09-11 03:15:16] [render] View=left pos=(-455.1312871753524, 0.0, 0.4551312871753524) roll=0
+[2025-09-11 03:15:17] [render] View=right pos=(455.1312871753524, 0.0, 0.4551312871753524) roll=0
+[2025-09-11 03:15:17] [done] Wrote 6 image(s) to /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_09
+[2025-09-11 04:33:30] [load] Loading module '/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_09.py'
+[2025-09-11 04:33:30] [load] Collected 1 object(s)
+[2025-09-11 04:33:30] [fit] bbox=(300.000,30.000,8.000) R=150.801 dist=675.357
+[2025-09-11 04:33:30] [render] View=top pos=(0.6753569220811979, 0.0, 675.3569220811978) roll=0
+[2025-09-11 04:33:30] [render] View=bottom pos=(0.6753569220811979, 0.0, -675.3569220811978) roll=180
+[2025-09-11 04:33:30] [render] View=front pos=(0.6753569220811979, 675.3569220811978, 0.0) roll=0
+[2025-09-11 04:33:30] [render] View=back pos=(0.6753569220811979, -675.3569220811978, 0.0) roll=180
+[2025-09-11 04:33:30] [render] View=left pos=(-675.3569220811978, 0.0, 0.6753569220811979) roll=0
+[2025-09-11 04:33:30] [render] View=right pos=(675.3569220811978, 0.0, 0.6753569220811979) roll=0
+[2025-09-11 04:33:30] [done] Wrote 6 image(s) to /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_09
+[2025-09-11 05:22:36] [load] Loading module '/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_09.py'
+[2025-09-11 05:22:36] [load] Collected 1 object(s)
+[2025-09-11 05:22:36] [fit] bbox=(290.000,52.000,12.000) R=147.435 dist=660.281
+[2025-09-11 05:22:36] [render] View=top pos=(0.6602803595728143, 0.0, 660.2803595728143) roll=0
+[2025-09-11 05:22:36] [render] View=bottom pos=(0.6602803595728143, 0.0, -660.2803595728143) roll=180
+[2025-09-11 05:22:36] [render] View=front pos=(0.6602803595728143, 660.2803595728143, 0.0) roll=0
+[2025-09-11 05:22:37] [render] View=back pos=(0.6602803595728143, -660.2803595728143, 0.0) roll=180
+[2025-09-11 05:22:37] [render] View=left pos=(-660.2803595728143, 0.0, 0.6602803595728143) roll=0
+[2025-09-11 05:22:37] [render] View=right pos=(660.2803595728143, 0.0, 0.6602803595728143) roll=0
+[2025-09-11 05:22:37] [done] Wrote 6 image(s) to /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_09
+[2025-09-11 05:26:54] [load] Loading module '/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_09.py'
+[2025-09-11 05:26:54] [load] Collected 1 object(s)
+[2025-09-11 05:26:54] [fit] bbox=(300.000,30.000,10.000) R=150.831 dist=675.491
+[2025-09-11 05:26:54] [render] View=top pos=(0.6754905488134857, 0.0, 675.4905488134857) roll=0
+[2025-09-11 05:26:55] [render] View=bottom pos=(0.6754905488134857, 0.0, -675.4905488134857) roll=180
+[2025-09-11 05:26:55] [render] View=front pos=(0.6754905488134857, 675.4905488134857, 0.0) roll=0
+[2025-09-11 05:26:55] [render] View=back pos=(0.6754905488134857, -675.4905488134857, 0.0) roll=180
+[2025-09-11 05:26:55] [render] View=left pos=(-675.4905488134857, 0.0, 0.6754905488134857) roll=0
+[2025-09-11 05:26:55] [render] View=right pos=(675.4905488134857, 0.0, 0.6754905488134857) roll=0
+[2025-09-11 05:26:55] [done] Wrote 6 image(s) to /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_09
+[2025-09-11 13:18:41] [load] Loading module '/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_09.py'
+[2025-09-11 13:18:41] [load] Collected 1 object(s)
+[2025-09-11 13:18:41] [fit] bbox=(252.000,60.000,25.000) R=130.124 dist=582.755
+[2025-09-11 13:18:41] [render] View=top pos=(0.5827548712509907, 0.0, 582.7548712509906) roll=0
+[2025-09-11 13:18:41] [render] View=bottom pos=(0.5827548712509907, 0.0, -582.7548712509906) roll=180
+[2025-09-11 13:18:41] [render] View=front pos=(0.5827548712509907, 582.7548712509906, 0.0) roll=0
+[2025-09-11 13:18:41] [render] View=back pos=(0.5827548712509907, -582.7548712509906, 0.0) roll=180
+[2025-09-11 13:18:42] [render] View=left pos=(-582.7548712509906, 0.0, 0.5827548712509907) roll=0
+[2025-09-11 13:18:42] [render] View=right pos=(582.7548712509906, 0.0, 0.5827548712509907) roll=0
+[2025-09-11 13:18:42] [done] Wrote 6 image(s) to /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_09

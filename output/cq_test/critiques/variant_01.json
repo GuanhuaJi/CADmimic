@@ -1,0 +1,16 @@
+{
+  "good": [
+    "The overall shape and proportions of the tongs are correct.",
+    "The model includes the scalloped ends for gripping food.",
+    "The presence and location of the wooden handle grips are accurate.",
+    "A hanging ring is correctly included at the end of one of the handles."
+  ],
+  "bad": [
+    "The model completely omits the spring mechanism located between the handles near the pivot point.",
+    "The metal handles are incorrectly modeled as simple flat plates, whereas the real object has handles formed from bent sheet metal into a C-channel shape.",
+    "The wooden grips are modeled as simple blocks attached to the outside of the metal, not as inlays that sit inside the metal channel.",
+    "The model lacks realistic thickness and appears as a flat 2D extrusion, especially evident in the front and side views.",
+    "The pivot point is overly simplified and doesn't accurately represent the rivet construction of the actual tongs."
+  ],
+  "score": 3
+}

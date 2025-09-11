@@ -1,0 +1,17 @@
+{
+  "good": [
+    "The overall shape and proportions of the tongs are generally correct.",
+    "The model correctly includes the two handle inserts.",
+    "The model features the circular ring at the hinge end.",
+    "The pivot point connecting the two arms is correctly placed."
+  ],
+  "bad": [
+    "The gripping ends of the tongs are completely incorrect; they are flat and straight in the model, but should be curved with a scalloped edge.",
+    "The arms of the tongs are modeled as perfectly straight, whereas the real object has a slight bend or curvature along its length.",
+    "The handle inserts are modeled as simple rectangular blocks with sharp edges, but the real ones have rounded, more ergonomic edges.",
+    "The model lacks the detail of the locking mechanism associated with the rear ring.",
+    "The metal components are too thin and lack the stamped U-channel shape that gives them rigidity in the real object.",
+    "The pivot is a simple cylinder, missing the details of the rivet used in the actual tongs."
+  ],
+  "score": 3
+}

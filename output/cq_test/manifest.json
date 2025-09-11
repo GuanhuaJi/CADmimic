@@ -1,0 +1,57 @@
+{
+  "variant_01": {
+    "code_file": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_01.py",
+    "images": {
+      "top": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_top.png",
+      "bottom": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_bottom.png",
+      "front": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_front.png",
+      "back": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_back.png",
+      "left": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_left.png",
+      "right": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_01/variant_01_right.png"
+    }
+  },
+  "variant_02": {
+    "code_file": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_02.py",
+    "images": {
+      "top": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_top.png",
+      "bottom": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_bottom.png",
+      "front": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_front.png",
+      "back": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_back.png",
+      "left": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_left.png",
+      "right": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_02/variant_02_right.png"
+    }
+  },
+  "variant_03": {
+    "code_file": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_03.py",
+    "images": {
+      "top": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_top.png",
+      "bottom": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_bottom.png",
+      "front": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_front.png",
+      "back": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_back.png",
+      "left": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_left.png",
+      "right": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_03/variant_03_right.png"
+    }
+  },
+  "variant_04": {
+    "code_file": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_04.py",
+    "images": {
+      "top": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_top.png",
+      "bottom": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_bottom.png",
+      "front": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_front.png",
+      "back": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_back.png",
+      "left": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_left.png",
+      "right": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_04/variant_04_right.png"
+    }
+  },
+  "variant_05": {
+    "code_file": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/codes/variant_05.py",
+    "images": {
+      "top": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_top.png",
+      "bottom": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_bottom.png",
+      "front": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_front.png",
+      "back": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_back.png",
+      "left": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_left.png",
+      "right": "/Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test/renders/variant_05/variant_05_right.png"
+    }
+  }
+}
