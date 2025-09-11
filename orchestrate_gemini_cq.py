@@ -124,10 +124,3 @@ if __name__ == "__main__":
     asyncio.run(main())
 
 
-'''
-python /Users/jiguanhua/vlmgineer/gemini_evolution/orchestrate_gemini_cq.py --prompt_txt \
-    /Users/jiguanhua/vlmgineer/exp2/prompt_1.txt --video /Users/jiguanhua/Downloads/20250902_155806.mp4 \
-        --model gemini-2.5-pro --api_key "AIzaSyA2_I5PEg1rn2HNK2mj8tpFWr9xBKvUr3w" --num 10 \
-            --out_dir /Users/jiguanhua/vlmgineer/gemini_evolution/output/cq_test --concurrency 10 \
-                --image_size 800
-'''

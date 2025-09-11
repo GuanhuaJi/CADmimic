@@ -15,17 +15,44 @@ VIEW_ORDER = ["top", "bottom", "front", "back", "left", "right"]
 CRITIQUE_PROMPT = (
     "You are given a short video of the target object and six rendered views of a CAD model "
     "(top, bottom, front, back, left, right). Critique how well the model matches the target and "
-    "how to improve it.\n"
-    "Return ONLY JSON with this shape:\n"
-    '{\n'
-    '  "good": ["point 1", "point 2", ...],\n'
-    '  "bad": ["issue 1", "issue 2", ...],\n'
+    "how to improve it.\n\n"
+
+    "Return ONLY JSON with this exact shape (no extra keys, no prose outside JSON):\n"
+    "{\n"
+    '  "good":  ["point 1", "point 2", ...],\n'
+    '  "bad":   ["issue 1", "issue 2", ...],\n'
     '  "score": 1\n'
-    '}\n'
-    "Rules:\n"
-    "- Under 8 bullets each for good/bad.\n"
-    "- score is an integer 1-10 where 1 = not like at all, 10 = exactly the same.\n"
-    "- No extra keys, no extra commentary."
+    "}\n\n"
+
+    "Guidelines for the critique (cover each area briefly with concrete, actionable points):\n"
+    "1) Overall form & silhouette: Does the CAD outline match the video from multiple views? "
+    "Check aspect ratio, major contours, and symmetry/axis alignment.\n"
+    "2) Proportions & scale: Judge relative sizes of subparts (length/width/height ratios) and spacing "
+    "between key features (e.g., hole-to-edge offsets). If uncertain, say 'unclear'.\n"
+    "3) Feature fidelity: Are holes/slots/chamfers/fillets, protrusions, and terminations present and in the "
+    "right positions and counts? Note missing or extra features and misplacements.\n"
+    "4) Joints, hinges & assembly: Are mating parts present and aligned? Note interpenetrations or unrealistic "
+    "gaps, missing clearances, degrees of freedom that seem wrong, or parts that should be separate bodies.\n"
+    "5) Thickness & structural robustness: Call out obviously too-thin/too-thick regions, abrupt thickness steps, "
+    "or sharp internal corners that should be filleted to reduce stress concentration. Prefer fillets at shoulders "
+    "and load transitions.\n"
+    "6) Manufacturability / 3D printability (if relevant): Avoid steep overhangs without support; prefer the ~45° rule; "
+    "avoid long unsupported bridges; ensure minimum wall thickness is reasonable for FFF/FDM (≈0.5 mm or higher depending "
+    "on nozzle). If subtractive, avoid undercuts or specify them.\n"
+    "7) Materials, finish & color: Comment on surface finish (matte/gloss), transparency vs. opacity, and approximate color "
+    "match to the video. Use color-difference thinking qualitatively (e.g., ΔE perception) but do not compute values.\n"
+    "8) Tolerances & alignment (qualitative): Note where GD&T-style concerns would matter (flatness/perpendicularity/"
+    "concentricity for pins/holes, parallelism of rails). Mention fit/clearance issues if evident.\n"
+    "9) Function & usability: Does the geometry plausibly perform the intended function shown in the video (e.g., "
+    "reach, contact, clamping)? Call out collisions, insufficient reach, or missing ergonomic details.\n"
+    "10) Improvements must be specific: Propose succinct edits to geometry (e.g., 'increase frame_depth from 4 mm to 6 mm', "
+    "'add 2 mm fillet at shoulder', 'move hole +3 mm in X', 'thicken wall to ≥0.8 mm', 'separate this body as a new part').\n\n"
+
+    "Formatting rules:\n"
+    "- 'good' and 'bad' are bullet lists of short, specific phrases (max 8 bullets each).\n"
+    "- 'score' is an integer 1–10: 1 = not like the target at all; 10 = matches extremely closely across views.\n"
+    "- If a guideline is not assessable from the media, add a 'bad' bullet like 'unclear: [reason]'.\n"
+    "- No extra commentary outside JSON.\n"
 )
 
 def _is_success_variant(log_path: Path, image_map: Dict[str, str]) -> tuple[bool, str]:

@@ -2,6 +2,7 @@ You are writing CADQuery code (Python 3).
 Use only the APIs listed below, do not use complex CADQuery APIs as they will cause bugs
 ## Task (video → CADQuery object)
 You are given 1 reference video of an object. Using that video only as a visual guide (do NOT load or process the image in code), generate CADQuery code that models the object as closely as reasonably possible while using only the allowed APIs.
+NOTE: make sure the color matches as well!
 
 Common CadQuery API for 2D Sketching and 3D Modeling
 Below is a list of common CadQuery APIs for creating 2D sketches and generating 3D features (extrusions and revolutions). For each API, we describe how to use it, its arguments, return values, and provide a usage example. Only use these APIs when generating code (do not invent new ones). This will help ensure the generated code is valid and runs without errors.
