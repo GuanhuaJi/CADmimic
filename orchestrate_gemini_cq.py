@@ -13,6 +13,8 @@ from render_six_views import render_six_views
 from critique import critique_variants
 from evolution import evolve_from_top2
 from utils import ensure_dir, write_text
+from datetime import datetime
+
 
 def parse_args():
     ap = argparse.ArgumentParser(description="Iterative: generate → render → critique → evolve")
@@ -181,8 +183,11 @@ async def main():
     global args
     args = parse_args()
 
-    root = Path(args.out_dir)
+    parent = Path(args.out_dir).resolve()
+    stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # filesystem-safe
+    root = parent / "output" / stamp
     ensure_dir(root)
+    print(f"[init] run directory → {root}")
 
     prompt_text = Path(args.prompt_txt).read_text(encoding="utf-8")
     print(f"[init] prompt len={len(prompt_text)}; model={args.model}")
