@@ -3,39 +3,41 @@
 import argparse, asyncio, json
 from pathlib import Path
 from typing import List, Dict
+from datetime import datetime
 
 from google import genai
 from google.genai import types
 
-from gemini_io import upload_video_and_wait_active, async_generate_variants, build_contents
+from gemini_io import prepare_source_media, async_generate_variants, build_contents
 from code_extraction import extract_python_code, write_code_files, sanitize_extrude_centered
 from render_six_views import render_six_views
 from critique import critique_variants
 from evolution import evolve_from_top2
 from utils import ensure_dir, write_text
-from datetime import datetime
-
 
 def parse_args():
     ap = argparse.ArgumentParser(description="Iterative: generate → render → critique → evolve")
     ap.add_argument("--prompt_txt", required=True)
-    ap.add_argument("--video", required=True)
+    # NEW: accept either --video or --image
+    grp = ap.add_mutually_exclusive_group(required=True)
+    grp.add_argument("--video", help="Path to a .mp4 (uses Files API)")
+    grp.add_argument("--image", help="Path to a .png/.jpg/.jpeg (sent as inline bytes)")
     ap.add_argument("--model", required=True)
     ap.add_argument("--api_key", required=True)
     ap.add_argument("--num", type=int, default=10, help="candidates per iteration")
-    ap.add_argument("--max_iter", type=int, default=1, help="number of evolution rounds (folders 1..max_iter)")
+    ap.add_argument("--max_iter", type=int, default=1, help="number of evolution rounds")
     ap.add_argument("--out_dir", required=True)
-    ap.add_argument("--concurrency", type=int, default=5, help="parallel requests/renders/critiques")
+    ap.add_argument("--concurrency", type=int, default=5, help="parallelism")
     ap.add_argument("--temperature", type=float, default=1.0)
-    ap.add_argument("--top_p", type=float, default=0.9)
-    ap.add_argument("--max_output_tokens", type=int, default=4096)
+    ap.add_argument("--top_p", type=float, default=0.95)
+    ap.add_argument("--max_output_tokens", type=int, default=1000000)
     ap.add_argument("--image_size", type=int, default=800)
     return ap.parse_args()
 
 async def generate_initial(
     client: genai.Client,
     model: str,
-    uploaded_file,
+    source_media,           # image Part or video File
     prompt_text: str,
     num: int,
     concurrency: int,
@@ -50,10 +52,9 @@ async def generate_initial(
     for d in (codes_dir, renders_root, critiques_dir):
         ensure_dir(d)
 
-    # Build contents (video first, then text)
-    contents = build_contents(uploaded_file, prompt_text)
+    # Build contents (media first, then text)
+    contents = build_contents(source_media, prompt_text)
 
-    # (We pass a config, but gemini_io._one_call forces tools + text/plain to stabilize resp.text)
     gen_config = types.GenerateContentConfig(
         temperature=args.temperature,
         top_p=args.top_p,
@@ -95,11 +96,11 @@ async def generate_initial(
     write_text(iter_dir / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=False))
     print(f"[iter 0] rendered and saved manifest")
 
-    # Critique working variants
+    # Critique working variants (media can be video or image)
     _ = await critique_variants(
         client=client,
         model=model,
-        video_file=uploaded_file,
+        source_media=source_media,
         manifest=manifest,
         renders_root=renders_root,
         out_dir=critiques_dir,
@@ -110,7 +111,7 @@ async def generate_initial(
 async def evolve_round(
     client: genai.Client,
     model: str,
-    uploaded_file,
+    source_media,           # image Part or video File
     prompt_text: str,
     prev_dir: Path,
     iter_dir: Path,
@@ -126,30 +127,26 @@ async def evolve_round(
     for d in (codes_dir, renders_root, critiques_dir):
         ensure_dir(d)
 
-    # Load previous manifest
     prev_manifest = json.loads((prev_dir / "manifest.json").read_text(encoding="utf-8"))
 
-    # Evolve top-2 into new candidates
     evolved_map = await evolve_from_top2(
         client=client,
         model=model,
-        uploaded_video_file=uploaded_file,
+        source_media=source_media,
         prompt_text=prompt_text,
         manifest=prev_manifest,
         renders_dir=prev_dir / "renders",
         critiques_dir=prev_dir / "critiques",
         out_dir=iter_dir,
         num=num,
-        concurrency=concurrency,   # same as --concurrency
+        concurrency=concurrency,
     )
 
-    # Extract + sanitize + save code files for this iteration
     texts_sorted = [evolved_map[k] for k in sorted(evolved_map.keys())]
     code_list: List[str] = [sanitize_extrude_centered(extract_python_code(t)) for t in texts_sorted]
     code_paths: List[Path] = write_code_files(code_list, codes_dir)
     print(f"[{iter_dir.name}] wrote {len(code_paths)} evolved code files")
 
-    # Render + manifest for this iteration
     manifest: Dict[str, Dict] = {}
     for idx, code_path in enumerate(code_paths, start=1):
         variant = f"variant_{idx:02d}"
@@ -167,11 +164,10 @@ async def evolve_round(
     write_text(iter_dir / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=False))
     print(f"[{iter_dir.name}] render complete")
 
-    # Critique for this iteration
     _ = await critique_variants(
         client=client,
         model=model,
-        video_file=uploaded_file,
+        source_media=source_media,
         manifest=manifest,
         renders_root=renders_root,
         out_dir=critiques_dir,
@@ -183,8 +179,9 @@ async def main():
     global args
     args = parse_args()
 
+    # timestamped run dir under <out_dir>/output/<stamp>
     parent = Path(args.out_dir).resolve()
-    stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")  # filesystem-safe
+    stamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     root = parent / "output" / stamp
     ensure_dir(root)
     print(f"[init] run directory → {root}")
@@ -193,15 +190,21 @@ async def main():
     print(f"[init] prompt len={len(prompt_text)}; model={args.model}")
 
     client = genai.Client(api_key=args.api_key)
-    print(f"[init] uploading video once and waiting ACTIVE: {args.video}")
-    uploaded_file = upload_video_and_wait_active(client, args.video)
 
-    # ---- iteration 0 (initial generation) ----
+    # Prepare media (image OR video)
+    if args.video:
+        print(f"[init] preparing video: {args.video}")
+    if args.image:
+        print(f"[init] preparing image: {args.image}")
+    source_media, media_kind = prepare_source_media(client, video_path=args.video, image_path=args.image)
+    print(f"[init] media_kind={media_kind}")
+
+    # ---- iteration 0 ----
     iter0 = root / "0"
     await generate_initial(
         client=client,
         model=args.model,
-        uploaded_file=uploaded_file,
+        source_media=source_media,
         prompt_text=prompt_text,
         num=args.num,
         concurrency=args.concurrency,
@@ -216,12 +219,12 @@ async def main():
         await evolve_round(
             client=client,
             model=args.model,
-            uploaded_file=uploaded_file,
+            source_media=source_media,
             prompt_text=prompt_text,
             prev_dir=prev_dir,
             iter_dir=curr_dir,
             num=args.num,
-            concurrency=args.concurrency,   # reuse --concurrency (no extra flag)
+            concurrency=args.concurrency,
             image_size=args.image_size,
         )
         prev_dir = curr_dir

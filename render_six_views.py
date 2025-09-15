@@ -4,6 +4,8 @@ import base64
 import importlib.util
 import math
 import os
+os.environ.setdefault("VTK_DEFAULT_OPENGL_WINDOW", "vtkOSOpenGLRenderWindow")
+os.environ.setdefault("QT_QPA_PLATFORM", "offscreen")
 import sys
 import traceback
 from datetime import datetime
@@ -61,18 +63,17 @@ def _to_shapes(objs) -> List[cq.Shape]:
                 # single compound that contains all assembly solids
                 shapes.append(o.toCompound())                                   # ok to bbox/preview as one shape
             elif isinstance(o, cq.Workplane):
-                # get *all* results, not just .val()
-                vals = []
+                # take only solids from the stack
+                solids = []
                 try:
-                    vals = o.vals()                                            # all items on the stack
+                    solids = o.solids().vals()          # <- all solids across the stack
                 except Exception:
-                    vals = []
-                if not vals:
-                    # fallback to raw stack if needed
-                    vals = [s for s in getattr(o, "objects", []) if isinstance(s, cq.Shape)]
-                for v in vals:
-                    if isinstance(v, cq.Shape):
-                        shapes.append(v)
+                    solids = []
+                if not solids:
+                    # fallback: whatever objects are Shapes on the stack
+                    solids = [s for s in getattr(o, "objects", []) if isinstance(s, cq.Shape)]
+                for s in solids:
+                    shapes.append(s)
             elif isinstance(o, cq.Shape):
                 shapes.append(o)
         except Exception:
@@ -216,3 +217,9 @@ if __name__ == "__main__":
     res = render_six_views(args.infile, args.outdir, args.size, args.margin, args.tilt_eps, args.log_file)
     for k, v in res.items():
         print(f"{k}: {v}")
+
+'''
+python /Users/jiguanhua/vlmgineer/CADmimic/render_six_views.py \
+    --infile /Users/jiguanhua/vlmgineer/CADmimic/output/2025-09-11_23-48-00/10/codes/variant_01.py \
+         --outdir /Users/jiguanhua/vlmgineer/gemini_evolution/output/2025-09-11_23-48-00/10/renders --size 800 --margin 1.2 --tilt_eps 0.001 --log_file /Users/jiguanhua/vlmgineer/gemini_evolution/output/2025-09-11_23-48-00/10/renders/variant_01_render.log
+'''
