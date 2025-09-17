@@ -2,7 +2,7 @@
 # orchestrate_gemini_cq.py
 import argparse, asyncio, json
 from pathlib import Path
-from typing import List, Dict
+from typing import Dict, List, Optional, Tuple
 from datetime import datetime
 
 from google import genai
@@ -14,6 +14,10 @@ from render_six_views import render_six_views
 from critique import critique_variants
 from evolution import evolve_from_top2
 from utils import ensure_dir, write_text
+from siglip_scoring import SiglipScorer
+
+SIGLIP_TOP_K = 2
+
 
 def parse_args():
     ap = argparse.ArgumentParser(description="Iterative: generate → render → critique → evolve")
@@ -34,6 +38,50 @@ def parse_args():
     ap.add_argument("--image_size", type=int, default=800)
     return ap.parse_args()
 
+
+def apply_siglip_scoring(
+    manifest: Dict[str, Dict],
+    iter_dir: Path,
+    siglip_scorer: Optional[SiglipScorer],
+    top_k: int,
+) -> Tuple[Dict[str, Dict], List[str]]:
+    if not siglip_scorer or top_k <= 0:
+        return manifest, list(manifest.keys())
+
+    results = siglip_scorer.score_manifest(manifest)
+    if not results:
+        print("[siglip] scoring returned no usable results; falling back to all variants")
+        return manifest, list(manifest.keys())
+
+    score_dump: Dict[str, Dict] = {}
+    for variant, result in results.items():
+        payload = {"view_scores": result.view_scores, "average": result.average}
+        manifest[variant]["siglip"] = payload
+        score_dump[variant] = payload
+
+    write_text(
+        iter_dir / "siglip_scores.json",
+        json.dumps(score_dump, indent=2, ensure_ascii=False),
+    )
+
+    ordered = sorted(score_dump.items(), key=lambda kv: kv[1]["average"], reverse=True)
+    ordered_names = [name for name, _ in ordered]
+
+    selected = ordered_names[:top_k]
+    if len(selected) < top_k:
+        remaining = [name for name in manifest.keys() if name not in selected]
+        for name in remaining:
+            selected.append(name)
+            if len(selected) == top_k:
+                break
+
+    print(f"[siglip] ranking: {ordered_names}")
+    print(f"[siglip] selected for critique: {selected}")
+
+    subset = {name: manifest[name] for name in selected}
+    return subset, ordered_names
+
+
 async def generate_initial(
     client: genai.Client,
     model: str,
@@ -43,6 +91,8 @@ async def generate_initial(
     concurrency: int,
     iter_dir: Path,
     image_size: int,
+    siglip_scorer: Optional[SiglipScorer],
+    top_k: int,
 ):
     print(f"[iter 0] generating {num} candidates")
     ensure_dir(iter_dir)
@@ -93,20 +143,26 @@ async def generate_initial(
             log_file=str(v_dir / f"{variant}_render.log"),
         )
         manifest[variant] = {"code_file": str(code_path), "images": img_map}
+
+    critique_manifest, _ = apply_siglip_scoring(manifest, iter_dir, siglip_scorer, top_k)
+
     write_text(iter_dir / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=False))
     print(f"[iter 0] rendered and saved manifest")
+
+    target_for_critique = critique_manifest if critique_manifest else manifest
 
     # Critique working variants (media can be video or image)
     _ = await critique_variants(
         client=client,
         model=model,
         source_media=source_media,
-        manifest=manifest,
+        manifest=target_for_critique,
         renders_root=renders_root,
         out_dir=critiques_dir,
         concurrency=concurrency,
     )
     print(f"[iter 0] critique complete")
+
 
 async def evolve_round(
     client: genai.Client,
@@ -118,6 +174,8 @@ async def evolve_round(
     num: int,
     concurrency: int,
     image_size: int,
+    siglip_scorer: Optional[SiglipScorer],
+    top_k: int,
 ):
     print(f"[evolve] from {prev_dir.name} → {iter_dir.name}: generating {num}")
     ensure_dir(iter_dir)
@@ -161,19 +219,25 @@ async def evolve_round(
             log_file=str(v_dir / f"{variant}_render.log"),
         )
         manifest[variant] = {"code_file": str(code_path), "images": img_map}
+
+    critique_manifest, _ = apply_siglip_scoring(manifest, iter_dir, siglip_scorer, top_k)
+
     write_text(iter_dir / "manifest.json", json.dumps(manifest, indent=2, ensure_ascii=False))
     print(f"[{iter_dir.name}] render complete")
+
+    target_for_critique = critique_manifest if critique_manifest else manifest
 
     _ = await critique_variants(
         client=client,
         model=model,
         source_media=source_media,
-        manifest=manifest,
+        manifest=target_for_critique,
         renders_root=renders_root,
         out_dir=critiques_dir,
         concurrency=concurrency,
     )
     print(f"[{iter_dir.name}] critique complete")
+
 
 async def main():
     global args
@@ -199,6 +263,15 @@ async def main():
     source_media, media_kind = prepare_source_media(client, video_path=args.video, image_path=args.image)
     print(f"[init] media_kind={media_kind}")
 
+    siglip_scorer: Optional[SiglipScorer] = None
+    if args.image:
+        try:
+            siglip_scorer = SiglipScorer(target_image_path=args.image)
+        except Exception as exc:
+            print(f"[siglip] initialization failed: {exc}")
+    else:
+        print("[siglip] skipping similarity scoring (no reference image provided)")
+
     # ---- iteration 0 ----
     iter0 = root / "0"
     await generate_initial(
@@ -210,6 +283,8 @@ async def main():
         concurrency=args.concurrency,
         iter_dir=iter0,
         image_size=args.image_size,
+        siglip_scorer=siglip_scorer,
+        top_k=SIGLIP_TOP_K,
     )
 
     # ---- evolution rounds 1..max_iter ----
@@ -226,10 +301,28 @@ async def main():
             num=args.num,
             concurrency=args.concurrency,
             image_size=args.image_size,
+            siglip_scorer=siglip_scorer,
+            top_k=SIGLIP_TOP_K,
         )
         prev_dir = curr_dir
 
     print(f"[done] pipeline complete under {root}")
 
+
 if __name__ == "__main__":
     asyncio.run(main())
+
+
+'''
+python /Users/jiguanhua/vlmgineer/CADmimic/orchestrate_gemini_cq.py --prompt_txt \
+    /Users/jiguanhua/vlmgineer/CADmimic/prompts/prompt_1.txt --image /Users/jiguanhua/vlmgineer/CADmimic/assets/cup_noun_002_09489.jpg \
+        --model gemini-2.5-pro --api_key "AIzaSyA2_I5PEg1rn2HNK2mj8tpFWr9xBKvUr3w" --num 8 \
+            --out_dir /Users/jiguanhua/vlmgineer/CADmimic --concurrency 8 \
+                --image_size 800 --max_iter 6
+
+python /Users/jiguanhua/vlmgineer/CADmimic/orchestrate_gemini_cq.py --prompt_txt \
+    /Users/jiguanhua/vlmgineer/CADmimic/prompts/prompt_1.txt --image /Users/jiguanhua/vlmgineer/CADmimic/assets/cup_noun_002_09489.jpg \
+        --model gemini-2.5-pro --api_key "AIzaSyA2_I5PEg1rn2HNK2mj8tpFWr9xBKvUr3w" --num 8 \
+            --out_dir /Users/jiguanhua/vlmgineer/CADmimic --concurrency 8 \
+                --image_size 800 --max_iter 6
+'''
